@@ -17,6 +17,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from packaging import version
 
 import logging
+from slackwebhook import send_message_to_slack
 
 # We can't use cmd_opts for this because it will not have been initialized at this point.
 log_level = os.environ.get("SD_WEBUI_LOG_LEVEL")
@@ -417,6 +418,8 @@ def webui():
             root_path=f"/{cmd_opts.subpath}" if cmd_opts.subpath else "",
         )
 
+        send_message_to_slack("The public gradio url for AUTOMATIC 1111 is " + share_url + "\n The link will expire in 72 hours")
+
         # after initial launch, disable --autolaunch for subsequent restarts
         cmd_opts.autolaunch = False
 
@@ -461,6 +464,7 @@ def webui():
         if server_command == "stop":
             print("Stopping server...")
             # If we catch a keyboard interrupt, we want to stop the server and exit.
+            send_message_to_slack("The public gradio url for AUTOMATIC 1111 " + share_url + "\n has expired")
             shared.demo.close()
             break
 
